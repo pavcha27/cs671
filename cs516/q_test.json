@@ -1,0 +1,104 @@
+[
+    {
+        "_id": {
+            "$oid": "624318bd0e26993f1ff0b6d3"
+        },
+        "pubkey": "dblpnote/error",
+        "title": "(error)"
+    },
+    {
+        "_id": {
+            "$oid": "624318bd0e26993f1ff0b6d4"
+        },
+        "pubkey": "dblpnote/neverpublished",
+        "title": "(was never published)"
+    },
+    {
+        "_id": {
+            "$oid": "624318bd0e26993f1ff0b6d5"
+        },
+        "pubkey": "dblpnote/ellipsis",
+        "title": "\u2026"
+    },
+    {
+        "_id": {
+            "$oid": "624318bd0e26993f1ff0b6d6"
+        },
+        "pubkey": "tr/gte/TR-0169-12-91-165",
+        "title": "Object Data Language Facilities for Multimedia Data Types.",
+        "year": 1991,
+        "authors": [
+            "Frank Manola"
+        ]
+    },
+    {
+        "_id": {
+            "$oid": "624318bd0e26993f1ff0b6d7"
+        },
+        "pubkey": "tr/gte/TM-0332-11-90-165",
+        "title": "Object Data Model Facilities for Multimedia Data Types.",
+        "year": 1990,
+        "authors": [
+            "Alejandro P. Buchmann",
+            "Mark F. Hornick",
+            "Frank Manola"
+        ]
+    },
+    {
+        "_id": {
+            "$oid": "624318bd0e26993f1ff0b6d8"
+        },
+        "pubkey": "tr/gte/TR-0263-08-94-165",
+        "title": "An Evaluation of Object-Oriented DBMS Developments: 1994 Edition.",
+        "year": 1994,
+        "authors": [
+            "Frank Manola"
+        ]
+    },
+    {
+        "_id": {
+            "$oid": "624318bd0e26993f1ff0b6d9"
+        },
+        "pubkey": "tr/gte/TR-0174-12-91-165",
+        "title": "Integrating Heterogeneous, Autonomous, Distributed Applications Using the DOM Prototype.",
+        "year": 1991,
+        "authors": [
+            "Mark F. Hornick",
+            "Farshad Nayeri",
+            "Joe D. Morrison"
+        ]
+    },
+    {
+        "_id": {
+            "$oid": "624318bd0e26993f1ff0b6da"
+        },
+        "pubkey": "tr/gte/TM-0149-06-89-165",
+        "title": "Object Model Capabilities For Distributed Object Management.",
+        "year": 1989,
+        "authors": [
+            "Frank Manola"
+        ]
+    },
+    {
+        "_id": {
+            "$oid": "624318bd0e26993f1ff0b6db"
+        },
+        "pubkey": "tr/gte/TM-0014-06-88-165",
+        "title": "Distributed Object Management Technology.",
+        "year": 1988,
+        "authors": [
+            "Frank Manola"
+        ]
+    },
+    {
+        "_id": {
+            "$oid": "624318bd0e26993f1ff0b6dc"
+        },
+        "pubkey": "tr/gte/TR-0244-12-93-165",
+        "title": "MetaObject Protocol Concepts for a RISC Object Model.",
+        "year": 1993,
+        "authors": [
+            "Frank Manola"
+        ]
+    }
+]

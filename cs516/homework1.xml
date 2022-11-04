@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<homework>
+<item>
+	<id>q1a</id>
+	<question> Count the number of tuples in Inproceedings </question>
+	<sql><![CDATA[
+        SELECT COUNT(*) AS cnt FROM Inproceedings;
+	]]></sql>
+    <result>
+        2956396
+    </result>
+</item>
+<item>
+	<id>q1b</id>
+	<question> Count the number of tuples in Article </question>
+	<sql><![CDATA[
+        SELECT COUNT(*) AS cnt FROM Article;
+	]]></sql>
+    <result>
+        2738932
+    </result>
+</item>
+<item>
+	<id>q1c</id>
+	<question> Count the number of tuples in Authorship </question>
+	<sql><![CDATA[
+        SELECT COUNT(*) AS cnt FROM Authorship;
+	]]></sql>
+    <result>
+        18128940
+    </result>
+</item>
+<item>
+	<id>q2a</id>
+	<question> Add a column "Area" in the Inproceedings table. </question>
+	<sql><![CDATA[
+        ALTER TABLE Inproceedings
+	ADD COLUMN Area text;
+	]]></sql>
+    <result>
+        
+    </result>
+</item>
+<item>
+    <id> q2b </id>
+    <question> Populate the column 'Area' with the values from the table if there is a match, otherwise set it to 'UNKNOWN' </question>
+    <sql><![CDATA[
+        	UPDATE Inproceedings
+        SET area = 'Database'
+        WHERE (booktitle = 'SIGMOD Conference'
+            	OR booktitle = 'VLDB'
+            	OR booktitle = 'ICDE'
+            	OR booktitle = 'PODS');
+        	
+        UPDATE Inproceedings
+        SET area = 'Theory'
+        WHERE (booktitle = 'STOC'
+            	OR booktitle = 'FOCS'
+            	OR booktitle = 'SODA'
+            	OR booktitle = 'ICALP');
+        	
+        UPDATE Inproceedings
+        SET area = 'Systems'
+        WHERE (booktitle = 'SIGCOMM'
+            	OR booktitle = 'ISCA'
+            	OR booktitle = 'HPCA'
+            	OR booktitle = 'PLDI');
+        	
+        UPDATE Inproceedings
+        SET area = 'ML-AI'
+        WHERE (booktitle = 'ICML'
+            	OR booktitle = 'NIPS'
+            	OR booktitle = 'NeurIPS'
+            	OR booktitle = 'AAAI'
+            	OR booktitle = 'IJCAI');
+        
+        UPDATE Inproceedings
+        SET area = 'UNKNOWN'
+        WHERE area IS NULL;
+	]]></sql>
+    <result>
+        
+    </result>
+</item>
+<item>
+    <id>q3a</id>
+    <question>Find the number of authors who published in each area (do not consider UNKNOWN). </question>
+    <sql><![CDATA[
+        SELECT area as area, COUNT(DISTINCT A.author) as cnt
+        FROM Authorship A, Inproceedings I
+        WHERE A.pubkey = I.pubkey AND NOT I.area = 'UNKNOWN'
+        GROUP BY area;
+    ]]></sql>
+    <result>
+        "Database"	16035
+"ML-AI"	52983
+"Systems"	12153
+"Theory"	8569
+    </result>
+</item>
+<item>
+    <id>q3b</id>
+    <question>Find the top-10 authors who published the most number of ``Database'' papers. </question>
+    <sql><![CDATA[
+        SELECT A.author, COUNT(author) as cnt
+        FROM Authorship A, Inproceedings I
+        WHERE A.pubkey = I.pubkey AND I.area = 'Database'
+        GROUP BY A.author
+        ORDER BY cnt DESC, author ASC
+        limit 10;
+    ]]></sql>
+    <result>
+        "Divesh Srivastava"	150
+        "H. V. Jagadish"		127
+        "Surajit Chaudhuri"	127
+        "Jiawei Han 0001"	110
+        "Philip S. Yu"		110
+        "Xuemin Lin 0001"	109
+        "Jeffrey F. Naughton"	108
+        "Beng Chin Ooi"		105
+        "Hector Garcia-Molina"	104
+        "Michael Stonebraker"	100
+    </result>
+</item>
+<item>
+	<id>q3c</id>
+	<question>Find the number of authors who published in exactly two of the four areas (do not consider UNKNOWN). </question>
+	<sql><![CDATA[
+	SELECT COUNT(T.author) as cnt
+	FROM (SELECT A.author
+	 	FROM Authorship A, Inproceedings I
+	  	WHERE A.pubkey = I.pubkey AND NOT I.area = 'UNKNOWN'
+	 	GROUP BY A.author
+	 	HAVING COUNT(DISTINCT area) = 2) T;
+	]]></sql>
+    <result>
+        	5776
+    </result>
+</item>
+<item>
+	<id>q3d</id>
+    <question>Find the number of authors who wrote more journal papers than conference papers (irrespective of research areas).</question>
+	<sql><![CDATA[
+        	WITH
+I_cnt AS (
+	SELECT A.author, COUNT(*) as conf_cnt
+	FROM Authorship A, Inproceedings I 
+	WHERE I.pubkey = A.pubkey
+	GROUP BY author
+),
+R_cnt AS (
+SELECT A.author, COUNT(*) as paper_cnt
+FROM Authorship A, Article R
+WHERE R.pubkey = A.pubkey
+GROUP BY author
+),
+agg_cnt AS (
+	SELECT R_cnt.author as author, COALESCE(I_cnt.conf_cnt, 0) as conf_cnt, R_cnt.paper_cnt as paper_cnt
+	FROM I_cnt RIGHT OUTER JOIN R_cnt on I_cnt.author=R_cnt.author
+)
+
+SELECT COUNT(*) as cnt
+FROM agg_cnt
+WHERE conf_cnt < paper_cnt
+	]]></sql>
+    <result>
+        	1300895
+    </result>
+</item>
+<item>
+	<id>q3e</id>
+    <question>
+    Among the authors who have published at least one “Database” paper (in any year), find the top-5 authors who published the
+    most number of papers (journal OR conference, in any area) since the year 2000 (including the year 2000).
+    </question>
+	<sql><![CDATA[
+        	SELECT T.author, SUM(T.papers) as cnt
+	FROM ((SELECT A.author, COUNT(*) as papers
+	   FROM Authorship A, Inproceedings I
+	   WHERE A.pubkey = I.pubkey AND I.year >= 2000
+	   GROUP BY A.author)
+	   UNION
+	   (SELECT A.author, COUNT(*) as papers
+	   FROM Authorship A, Article R
+	   WHERE A.pubkey = R.pubkey AND R.year >= 2000
+	   GROUP BY A.author)) T
+	WHERE T.author IN (SELECT A.author
+				   FROM Authorship A, Inproceedings I
+				   WHERE A.pubkey = I.pubkey AND I.area = 'Database')
+	GROUP BY T.author
+	ORDER BY cnt DESC, T.author ASC
+	limit 5;
+	]]></sql>
+	<result>
+        "Wei Wang"	1482
+	"Yang Liu"	1459
+	"Yu Zhang"	1443
+	"Lei Zhang"	1420
+	"Philip S. Yu" 1410
+	</result>
+</item>
+<item>
+    <id>q4a</id>
+    <question>
+    Plot a linegraph with two lines, one for the number of journal papers and the other for the number of conference papers in
+    every decade starting from 1950.
+    </question>
+    <sql><![CDATA[
+        WITH
+I_agg AS (
+	SELECT 10*ROUND(I.year/10) as decade, COUNT(*) as num_confs
+	FROM Inproceedings I
+	GROUP BY decade
+),
+R_agg AS (
+	SELECT 10*ROUND(R.year/10) as decade, COUNT(*) as num_journals
+	FROM Article R
+	GROUP BY decade
+)
+
+SELECT CAST(decade as integer), num_journals, num_confs
+FROM (I_agg NATURAL JOIN R_agg) agg
+WHERE decade >=1950
+ORDER BY decade ASC;
+    ]]></sql>
+    <result>
+        1950	833	1731
+1960	2966	10095
+1970	15162	30314
+1980	58322	70700
+1990	233170	204592
+2000	819806	556510
+2010	1541253	1361637
+2020	284884	503106
+    </result>
+</item>
+<item>
+    <id>q4b</id>
+    <question>
+    Plot a barchart showing how the average number of "collaborators" varied in each decade starting from 1950 in
+    each of the four areas.
+    </question>
+    <sql><![CDATA[
+        WITH
+-- find the authors that actually made a conference paper in an area
+AI_decade_area AS (
+	SELECT A.author, CAST(10*ROUND(I.year/10) as integer) as decade, area
+	FROM Authorship A, Inproceedings I
+	WHERE A.pubkey = I.pubkey AND NOT I.area = 'UNKNOWN'
+),
+-- essentially append decade to the authorship table
+A_decade AS (
+	(SELECT I.pubkey, A1.author, CAST(10*ROUND(I.year/10) as integer) as decade
+	FROM Authorship A1, Inproceedings I
+	WHERE A1.pubkey = I.pubkey)
+	UNION
+	(SELECT R.pubkey, A2.author, CAST(10*ROUND(R.year/10) as integer) as decade
+	FROM Authorship A2, Article R
+	WHERE A2.pubkey = R.pubkey)
+),
+-- actually get the number of collaborators
+collab_decade_area AS (
+SELECT authors.author,
+	A0.decade as decade, 
+	A0.area as area, 
+	CAST(COUNT(DISTINCT collabs.author) as double precision) as num_collabs
+	FROM AI_decade_area A0, Authorship authors, A_decade collabs
+	WHERE (authors.author = A0.author) AND
+		(A0.decade = collabs.decade) AND
+		(authors.pubkey = collabs.pubkey) AND
+		(NOT authors.author = collabs.author)
+	GROUP BY authors.author, A0.decade, A0.area
+)
+
+SELECT decade, area, CAST(AVG(num_collabs) as double precision) as avgcollab
+FROM collab_decade_area
+GROUP BY decade, area
+ORDER BY decade, area;
+    ]]></sql>
+    <result>
+        1960	"ML-AI"	2.3375
+1960	"Theory"	2.2
+1970	"Database"	6.257403189066059
+1970	"ML-AI"	4.181701030927835
+1970	"Systems"	4.961748633879782
+1970	"Theory"	5.103238866396761
+1980	"Database"	8.704719387755102
+1980	"ML-AI"	5.788508557457213
+1980	"Systems"	7.371149511645379
+1980	"Theory"	9.815813953488371
+1990	"Database"	14.473778735632184
+1990	"ML-AI"	11.577718316711263
+1990	"Systems"	15.459324847814056
+1990	"Theory"	15.853543979504696
+2000	"Database"	27.921995926680243
+2000	"ML-AI"	25.028187440532825
+2000	"Systems"	28.88306299509619
+2000	"Theory"	25.40560621411685
+2010	"Database"	60.60418158384648
+2010	"ML-AI"	54.820535003633594
+2010	"Systems"	58.00673174015483
+2010	"Theory"	35.60338243316967
+2020	"Database"	51.00180396873121
+2020	"ML-AI"	39.84050225929788
+2020	"Systems"	39.014263074484944
+2020	"Theory"	19.486095661846495
+    </result>
+</item>
+<item>
+    <id>q4c</id>
+    <question>
+    Plot a barchart showing how the average number of authors per paper varied in each decade starting from 1950 in each of
+    the four areas.
+    </question>
+    <sql><![CDATA[
+        WITH
+-- find the authors that actually made a conference paper in an area
+AI_decade_area AS (
+	SELECT A.pubkey, A.author, CAST(10*ROUND(I.year/10) as integer) as decade, area
+	FROM Authorship A, Inproceedings I
+	WHERE A.pubkey = I.pubkey AND NOT I.area = 'UNKNOWN'
+),
+-- counts the authors in each publication
+pubkey_decade_area AS (
+	SELECT pubkey, decade, area, CAST(COUNT(author) as double precision) as author_cnt
+	FROM AI_decade_area
+	GROUP BY pubkey, decade, area
+)
+
+SELECT decade, area, CAST(AVG(author_cnt) as double precision) as avgcoauthor
+FROM pubkey_decade_area
+GROUP BY decade, area
+ORDER BY decade, area;
+    ]]></sql>
+    <result>
+        1960	"ML-AI"	1.746031746031746
+1960	"Theory"	1.2903225806451613
+1970	"Database"	1.8484848484848484
+1970	"ML-AI"	1.7921052631578946
+1970	"Systems"	1.91796875
+1970	"Theory"	1.5780189959294437
+1980	"Database"	2.0608584240871237
+1980	"ML-AI"	1.8215767634854771
+1980	"Systems"	2.2572877059569074
+1980	"Theory"	1.87546699875467
+1990	"Database"	2.664611590628853
+1990	"ML-AI"	2.1149580741141465
+1990	"Systems"	2.7419651056014693
+1990	"Theory"	2.291117279666898
+2000	"Database"	3.403598971722365
+2000	"ML-AI"	2.7348462227530606
+2000	"Systems"	3.614329268292683
+2000	"Theory"	2.479196556671449
+2010	"Database"	4.078037007240547
+2010	"ML-AI"	3.51893622260527
+2010	"Systems"	4.610526315789474
+2010	"Theory"	2.8099570381602224
+2020	"Database"	4.472370766488414
+2020	"ML-AI"	4.180505795574288
+2020	"Systems"	5.792114695340501
+2020	"Theory"	2.943050193050193
+    </result>
+</item>
+<item>
+    <id>q4d</id>
+    <question>
+    Using the query in Q4c as a subquery, and using a single SQL query, compute the "trend" in the average number of authors per
+    paper over each decade starting from 1950 in each of the four areas, in terms of the slopes in "linear regression".
+    </question>
+    <sql><![CDATA[
+        WITH
+-- find the authors that actually made a conference paper in an area
+AI_decade_area AS (
+	SELECT A.pubkey, A.author, CAST(10*ROUND(I.year/10) as integer) as decade, area
+	FROM Authorship A, Inproceedings I
+	WHERE A.pubkey = I.pubkey AND NOT I.area = 'UNKNOWN'
+),
+-- counts the authors in each publication
+pubkey_decade_area AS (
+	SELECT pubkey, decade, area, CAST(COUNT(author) as double precision) as author_cnt
+	FROM AI_decade_area
+	GROUP BY pubkey, decade, area
+),
+-- average authors in each decade/area
+averages AS (
+	SELECT decade, area, CAST(AVG(author_cnt) as double precision) as avgcoauthor
+	FROM pubkey_decade_area
+	GROUP BY decade, area
+)
+-- do least squares
+SELECT area,
+	((CAST(COUNT(decade) as double precision)*CAST(SUM((decade - 1950)*(avgcoauthor)) as double precision)) - CAST(SUM(decade - 1950)*SUM(avgcoauthor) as double precision))/((CAST(COUNT(decade) as double precision)*CAST(SUM((decade - 1950)*(decade - 1950)) as double precision)) - CAST(SUM(decade - 1950)*SUM(decade - 1950) as double precision)) as slope
+FROM averages
+GROUP BY area
+ORDER BY area
+    ]]></sql>
+    <result>
+        "Database"	0.056885579201633195
+"ML-AI"	0.041679834024249865
+"Systems"	0.07800802776826112
+"Theory"	0.028663530284262304
+    </result>
+</item>
+</homework>

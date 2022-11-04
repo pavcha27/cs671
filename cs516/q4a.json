@@ -1,0 +1,82 @@
+[
+    {
+        "author": "Divesh Srivastava",
+        "num_papers": 142
+    },
+    {
+        "author": "Surajit Chaudhuri",
+        "num_papers": 121
+    },
+    {
+        "author": "Jiawei Han 0001",
+        "num_papers": 109
+    },
+    {
+        "author": "Jeffrey F. Naughton",
+        "num_papers": 107
+    },
+    {
+        "author": "Philip S. Yu",
+        "num_papers": 106
+    },
+    {
+        "author": "H. V. Jagadish",
+        "num_papers": 105
+    },
+    {
+        "author": "Hector Garcia-Molina",
+        "num_papers": 103
+    },
+    {
+        "author": "Raghu Ramakrishnan",
+        "num_papers": 98
+    },
+    {
+        "author": "Beng Chin Ooi",
+        "num_papers": 92
+    },
+    {
+        "author": "Michael Stonebraker",
+        "num_papers": 90
+    },
+    {
+        "author": "Kian-Lee Tan",
+        "num_papers": 87
+    },
+    {
+        "author": "Michael J. Carey 0001",
+        "num_papers": 82
+    },
+    {
+        "author": "Rakesh Agrawal 0001",
+        "num_papers": 81
+    },
+    {
+        "author": "Nick Koudas",
+        "num_papers": 80
+    },
+    {
+        "author": "David J. DeWitt",
+        "num_papers": 79
+    },
+    {
+        "author": "Michael J. Franklin",
+        "num_papers": 76
+    },
+    {
+        "author": "Christos Faloutsos",
+        "num_papers": 75
+    },
+    {
+        "author": "Jeffrey Xu Yu",
+        "num_papers": 75
+    },
+    {
+        "author": "Dan Suciu",
+        "num_papers": 74
+    },
+    {
+        "author": "Divyakant Agrawal",
+        "num_papers": 72
+    }
+]
